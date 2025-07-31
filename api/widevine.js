@@ -1,27 +1,32 @@
-// /api/widevine.js
+import axios from "axios";
+
+// Replace with your real Widevine license server
+const LICENSE_SERVER_URL = 'https://key.salidaph.online/widevine';
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).end("Method Not Allowed");
+  if (req.method !== 'POST') {
+    return res.status(405).send('Method Not Allowed');
   }
-
-  const licenseRequest = req.body;
 
   try {
-    const fetchResponse = await fetch("https://key.salidaph.online/widevine", {
-      method: "POST",
+    const licenseRes = await axios.post(LICENSE_SERVER_URL, req.body, {
       headers: {
-        "Content-Type": "application/octet-stream"
+        'Content-Type': 'application/octet-stream',
+        'Accept': '*/*',
       },
-      body: licenseRequest
+      responseType: 'arraybuffer',
     });
 
-    const licenseResponse = await fetchResponse.arrayBuffer();
-
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.send(Buffer.from(licenseResponse));
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.status(licenseRes.status).send(licenseRes.data);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "License fetch failed" });
+    console.error("Widevine proxy error:", err.message);
+    res.status(err.response?.status || 500).send("Proxy failed");
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: false, // required for binary requests
+  },
+};
