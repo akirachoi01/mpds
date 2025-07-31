@@ -14,19 +14,21 @@
 
   <script>
     jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";
+jwplayer("player").setup({
+  file: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/tv5_hd.mpd",
+  drm: {
+    widevine: {
+      url: "https://key.salidaph.online/widevine",
+      robustness: {
+        video: "SW_SECURE_DECODE",
+        audio: "SW_SECURE_CRYPTO"
+      }
+    }
+  },
+  type: "dash"
+});
 
-    jwplayer("player").setup({
-      file: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/tv5_hd.mpd",
-      type: "dash",
-      drm: {
-        widevine: {
-          url: "https://key.salidaph.online/widevine",
-          robustness: {
-            video: "SW_SECURE_DECODE",
-            audio: "SW_SECURE_CRYPTO"
-          }
-        }
-      },
+  
       width: "100%",
       aspectratio: "16:9",
       autostart: true
