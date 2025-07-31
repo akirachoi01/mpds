@@ -1,41 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Widevine DASH Player</title>
+  <meta charset="UTF-8">
+  <title>Widevine DRM Test</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
   <style>
     body {
-      background-color: #121212;
-      color: white;
+      background: #121212;
+      color: #fff;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      text-align: center;
+      padding-top: 40px;
+    }
+    select, video {
+      margin-top: 20px;
     }
     video {
       width: 80%;
       max-width: 720px;
-      margin-top: 20px;
+      border: 2px solid #555;
     }
   </style>
 </head>
 <body>
-  <h1>Widevine DASH Test</h1>
+  <h1>Widevine DRM Stream Player</h1>
+  <label for="streamSelect">Choose a stream:</label>
+  <select id="streamSelect">
+    <option value="/TV5.mpd">TV5</option>
+    <option value="/PBOsd.mpd">PBO SD</option>
+    <option value="/OnePH.mpd">One PH</option>
+    <option value="/OneNews.mpd">One News</option>
+    <option value="/Gtv.mpd">GTV</option>
+    <option value="/1335.mpd">1335</option>
+    <option value="/abs-cbn-cinemaone-dash-abscbnono.mpd">Cinema One</option>
+  </select>
+
   <video id="video" controls autoplay></video>
 
   <script>
-    async function initPlayer() {
+    async function initPlayer(manifestUri) {
       const video = document.getElementById('video');
       const player = new shaka.Player(video);
 
-      // Log errors
-      player.addEventListener('error', e => console.error('Shaka Error:', e.detail));
-
-      // OPTIONAL: DRM config (you can skip this if your streams aren't encrypted)
       player.configure({
         drm: {
           servers: {
@@ -44,15 +50,26 @@
         }
       });
 
+      player.addEventListener('error', e => {
+        console.error('Error code', e.detail.code, 'object', e.detail);
+      });
+
       try {
-        await player.load('/TV5.mpd');  // or '/streams/TV5.mpd' depending on your path
-        console.log('Video loaded successfully');
-      } catch (err) {
-        console.error('Failed to load video:', err);
+        await player.load(manifestUri);
+        console.log('Playing:', manifestUri);
+      } catch (error) {
+        console.error('Error loading stream:', error);
       }
     }
 
-    document.addEventListener('DOMContentLoaded', initPlayer);
+    // Load initial stream
+    const select = document.getElementById('streamSelect');
+    initPlayer(select.value);
+
+    // Change stream on selection
+    select.addEventListener('change', () => {
+      initPlayer(select.value);
+    });
   </script>
 </body>
 </html>
