@@ -1,25 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Widevine DRM</title>
+  <title>Widevine DASH Player</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       background-color: #121212;
       color: white;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      margin: 0;
+    }
+    video {
+      width: 80%;
+      max-width: 720px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Widevine DRM</h1>
-  <p>This page is live at <code>/widevine/</code></p>
-  <p>POST to <code>/api/widevine</code> to test the endpoint.</p>
+  <h1>Widevine DASH Test</h1>
+  <video id="video" controls autoplay></video>
+
+  <script>
+    async function initPlayer() {
+      const video = document.getElementById('video');
+      const player = new shaka.Player(video);
+
+      // Log errors
+      player.addEventListener('error', e => console.error('Shaka Error:', e.detail));
+
+      // OPTIONAL: DRM config (you can skip this if your streams aren't encrypted)
+      player.configure({
+        drm: {
+          servers: {
+            'com.widevine.alpha': '/api/widevine'
+          }
+        }
+      });
+
+      try {
+        await player.load('/TV5.mpd');  // or '/streams/TV5.mpd' depending on your path
+        console.log('Video loaded successfully');
+      } catch (err) {
+        console.error('Failed to load video:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPlayer);
+  </script>
 </body>
 </html>
