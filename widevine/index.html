@@ -1,74 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Widevine DRM Test</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
+  <title>TV5 HD Test (Live Stream)</title>
+  <script src="https://jwplayer.salidaph.online/player/v/8.36.6/jwplayer.js"></script>
+  <script>
+    jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";
+  </script>
   <style>
-    body {
-      background: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 40px;
-    }
-    select, video {
-      margin-top: 20px;
-    }
-    video {
-      width: 80%;
-      max-width: 720px;
-      border: 2px solid #555;
-    }
+    body { background: #121212; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 40px; }
+    #player { width: 80%; max-width: 720px; margin: 0 auto; }
   </style>
 </head>
 <body>
-  <h1>Widevine DRM Stream Player</h1>
-  <label for="streamSelect">Choose a stream:</label>
-  <select id="streamSelect">
-    <option value="/TV5.mpd">TV5</option>
-    <option value="/PBOsd.mpd">PBO SD</option>
-    <option value="/OnePH.mpd">One PH</option>
-    <option value="/OneNews.mpd">One News</option>
-    <option value="/Gtv.mpd">GTV</option>
-    <option value="/1335.mpd">1335</option>
-    <option value="/abs-cbn-cinemaone-dash-abscbnono.mpd">Cinema One</option>
-  </select>
-
-  <video id="video" controls autoplay></video>
-
+  <h1>Live TV5 HD with Widevine</h1>
+  <div id="player"></div>
   <script>
-    async function initPlayer(manifestUri) {
-      const video = document.getElementById('video');
-      const player = new shaka.Player(video);
-
-      player.configure({
-        drm: {
-          servers: {
-            'com.widevine.alpha': '/api/widevine'
-          }
+    jwplayer("player").setup({
+      file: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/tv5_hd.mpd",
+      type: "dash",
+      drm: {
+        widevine: {
+          url: "https://key.salidaph.online/api/widevine"
         }
-      });
-
-      player.addEventListener('error', e => {
-        console.error('Error code', e.detail.code, 'object', e.detail);
-      });
-
-      try {
-        await player.load(manifestUri);
-        console.log('Playing:', manifestUri);
-      } catch (error) {
-        console.error('Error loading stream:', error);
-      }
-    }
-
-    // Load initial stream
-    const select = document.getElementById('streamSelect');
-    initPlayer(select.value);
-
-    // Change stream on selection
-    select.addEventListener('change', () => {
-      initPlayer(select.value);
+      },
+      autostart: true,
+      width: "100%",
+      aspectratio: "16:9"
     });
   </script>
 </body>
